@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工賃について - ココデザイン | 就労継続支援B型事業所</title>
+    
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts の読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js の読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        /* ヘッダーのナビゲーションリンクのホバーエフェクト */
+        .nav-link {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #4f46e5; /* Tailwind indigo-600 */
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* スクロール表示アニメーション用 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+        .scroll-reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 見学ボタンのアニメーション */
+        @keyframes noticeable-bounce {
+          0%, 100% {
+            transform: translateY(-8%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+          }
+          50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+        .animate-noticeable-bounce {
+            animation: noticeable-bounce 2s infinite;
+        }
+        
+        /* グラフのスタイル */
+        #wageComparisonChart {
+            height: 200px !important;
+        }
+
+        /* 右下固定LINEボタン */
+        .fixed-line-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- ===== ヘッダー ===== -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-sm shadow-sm">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="./index.html" class="text-2xl font-bold text-slate-800">ココデザイン</a>
+            <div class="flex items-center">
+                <nav class="hidden md:flex items-center space-x-4 lg:space-x-6">
+                    <a href="./index.html" class="nav-link text-slate-600 hover:text-indigo-600">TOP</a>
+                    <a href="./work.html" class="nav-link text-slate-600 hover:text-indigo-600">仕事について</a>
+                    <a href="./wage.html" class="nav-link text-slate-600 hover:text-indigo-600">工賃について</a>
+                    <a href="./flow.html" class="nav-link text-slate-600 hover:text-indigo-600">利用までの流れ</a>
+                    <a href="./faq.html" class="nav-link text-slate-600 hover:text-indigo-600">よくある質問</a>
+                    <a href="./access.html" class="nav-link text-slate-600 hover:text-indigo-600">アクセス</a>
+                </nav>
+            </div>
+            <button id="menu-btn" class="md:hidden focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="./index.html" class="block py-2 px-4 text-sm hover:bg-slate-200">TOP</a>
+            <a href="./work.html" class="block py-2 px-4 text-sm hover:bg-slate-200">仕事について</a>
+            <a href="./wage.html" class="block py-2 px-4 text-sm hover:bg-slate-200">工賃について</a>
+            <a href="./flow.html" class="block py-2 px-4 text-sm hover:bg-slate-200">利用までの流れ</a>
+            <a href="./faq.html" class="block py-2 px-4 text-sm hover:bg-slate-200">よくある質問</a>
+            <a href="./access.html" class="block py-2 px-4 text-sm hover:bg-slate-200">アクセス</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== ページヘッダー ===== -->
+        <section class="relative h-64 md:h-80 w-full flex items-center justify-center text-center text-white bg-slate-800">
+            <div class="absolute top-0 left-0 w-full h-full">
+                <img src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?q=80&w=1920&auto=format&fit=crop" alt="工賃のイメージ" class="w-full h-full object-cover opacity-30">
+            </div>
+            <div class="relative z-10 px-4">
+                <h1 class="text-4xl md:text-5xl font-black" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.7);">工賃について</h1>
+            </div>
+        </section>
+
+        <!-- ===== 工賃の紹介 ===== -->
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="inline-block text-3xl md:text-4xl font-bold text-slate-800 pb-2 border-b-4 border-amber-400">業界トップクラスの工賃で、<br class="md:hidden"><span class="text-amber-500 font-black">あなたの頑張り</span>に応えます。</h2>
+                    <p class="text-slate-600 mt-8 mb-16 max-w-2xl mx-auto">私たちは、利用者の皆様の経済的な自立も重要な目標の一つと考えています。ネットショップ運営で得た利益を工賃として適切に還元することで、仕事へのやりがいと生活の安定をサポートします。</p>
+                </div>
+                
+                <div class="max-w-4xl mx-auto bg-slate-50 rounded-2xl shadow-lg p-8 md:p-12 scroll-reveal">
+                    <div class="md:flex items-center gap-8">
+                                                 <div class="md:w-1/2 text-center mb-8 md:mb-0">
+                             <p class="text-slate-700 font-medium">時給単価</p>
+                             <p class="text-6xl md:text-7xl font-black text-indigo-600">350<span class="text-3xl">円</span></p>
+                             <hr class="my-6 border-slate-200">
+                             <p class="text-slate-700 font-medium">月額工賃例</p>
+                             <p class="text-5xl md:text-6xl font-black text-indigo-600">35,000<span class="text-2xl">円以上</span></p>
+                             <p class="text-sm text-slate-600 mt-2">※1日5時間、月20日就業の場合</p>
+                         </div>
+                                                 <div class="md:w-1/2">
+                             <div class="bg-gradient-to-br from-indigo-25 to-purple-25 p-6 rounded-xl shadow-lg border border-indigo-50">
+                                 <h3 class="font-bold text-center text-slate-800 mb-6 text-lg">千葉県の平均工賃との比較</h3>
+                                 
+                                                                   <!-- グラフエリア -->
+                                  <div class="mb-6 bg-white/40 p-4 rounded-lg relative" style="height: 250px;">
+                                      <canvas id="wageComparisonChart"></canvas>
+                                      
+                                                                             
+                                  </div>
+                                 
+                                                                   <!-- 比較結果のハイライト -->
+                                  <div class="text-center -mt-2">
+                                      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-200 shadow-sm">
+                                          <div class="flex items-center justify-center mb-2">
+                                              <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                                              <span class="text-xs font-bold text-emerald-800">業界トップクラス</span>
+                                          </div>
+                                          
+                                                                                                                                <div class="text-2xl font-black text-emerald-600 mb-1">
+                                               <span class="text-sm font-medium text-emerald-700">県平均より</span>150%！
+                                           </div>
+                                          
+                                          <div class="mt-2 pt-2 border-t border-emerald-200">
+                                              <div class="text-xs text-emerald-600">
+                                                  <span class="font-semibold">14,068円</span> の差
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 評価制度 ===== -->
+        <section class="py-24 bg-slate-100">
+            <div class="container mx-auto px-6">
+                <div class="scroll-reveal md:flex items-center gap-12 max-w-5xl mx-auto">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop" alt="評価制度のイメージ" class="rounded-xl shadow-lg w-full">
+                    </div>
+                    <div class="md:w-1/2 text-left">
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-4">明確な<span class="text-indigo-600">評価制度</span></h2>
+                        <p class="text-slate-600 leading-relaxed text-lg">ココデザインでは、あなたの<strong class="text-slate-700">スキルアップ</strong>や<strong class="text-slate-700">貢献度</strong>を正当に評価し、工賃に反映させるための明確な評価制度を設けています。定期的な面談を通じて目標を設定し、達成度に応じて<strong class="text-indigo-600">工賃がアップ</strong>する仕組みです。あなたの「できること」が増えるたびに、収入も増えていきます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ボーナス ===== -->
+        <section class="py-24 bg-amber-50">
+            <div class="container mx-auto px-6">
+                <div class="scroll-reveal md:flex flex-row-reverse items-center gap-12 max-w-5xl mx-auto">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop" alt="ボーナスのイメージ" class="rounded-xl shadow-lg w-full">
+                    </div>
+                    <div class="md:w-1/2 text-left">
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-4"><span class="text-amber-500">ボーナス</span>（賞与）制度</h2>
+                        <p class="text-slate-600 leading-relaxed text-lg">日々の工賃に加えて、事業所の業績に応じて<strong class="text-amber-500">ボーナス（賞与）</strong>を支給しています。これは、チーム全員で協力して目標を達成した証です。みんなの頑張りが形になることで、<strong class="text-slate-700">さらなるモチベーション</strong>に繋がります。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 見学誘導バナー ===== -->
+        <section id="tour-banner" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <div class="container mx-auto px-6 py-20 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">まずは、事業所の雰囲気を<br class="md:hidden"><span class="font-black">見に来ませんか？</span></h2>
+                <p class="text-lg mb-8">「どんな場所なんだろう？」「自分に合うかな？」<br>その不安、見学で解消しましょう。</p>
+                <a href="https://lin.ee/7DSyjyw" class="inline-block bg-white text-indigo-600 font-bold py-5 px-16 rounded-full text-xl hover:bg-slate-100 transition-all duration-300 shadow-lg transform hover:shadow-xl animate-noticeable-bounce">
+                    見学はこちら
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== LINE友だち追加セクション ===== -->
+        <section id="line-friend" class="bg-white py-20">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto bg-slate-50 rounded-2xl p-8 shadow-lg">
+                    <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+                        <!-- 左側：テキスト情報 -->
+                        <div class="flex-1 text-center lg:text-left space-y-6">
+                            <div class="space-y-4">
+                                <h3 class="text-2xl font-bold text-slate-800">最新情報やお問い合わせは<br>LINEからどうぞ！</h3>
+                                <p class="text-lg text-slate-600">見学のご予約も簡単にできます。</p>
+                            </div>
+                            
+                            <!-- スマホユーザー向けリンク -->
+                            <div class="space-y-4">
+                                <p class="text-sm text-slate-500">スマートフォンの方はこちらをタップ</p>
+                                <a href="https://lin.ee/7DSyjyw" target="_blank" class="inline-block bg-green-500 text-white font-bold py-4 px-8 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md transform hover:scale-105">
+                                    ▶ LINEで友だち追加
+                                </a>
+                            </div>
+                            
+                            <div class="text-sm text-slate-500">
+                                <p>QRコードを読み取るか、ボタンをタップして友だち追加してください</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 右側：QRコード -->
+                        <div class="flex-1 flex justify-center">
+                            <img src="images/L_gainfriends_2dbarcodes_GW.png" alt="LINE QRコード" class="w-48 h-48 border-4 border-green-500 rounded-xl shadow-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== フッター ===== -->
+    <footer class="bg-slate-800 text-white">
+        <div class="container mx-auto px-6 py-10">
+            <div class="text-center mb-8">
+                <a href="./index.html" class="text-2xl font-bold text-white">ココデザイン</a>
+                <p class="text-slate-400 text-sm mt-2">
+                    〒123-4567 東京都渋谷区〇〇 1-2-3 | TEL: 03-1234-5678
+                </p>
+            </div>
+            <div class="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-8">
+                <a href="./work.html" class="text-slate-400 hover:text-white">仕事について</a>
+                <a href="./wage.html" class="text-slate-400 hover:text-white">工賃について</a>
+                <a href="./flow.html" class="text-slate-400 hover:text-white">利用までの流れ</a>
+                <a href="./faq.html" class="text-slate-400 hover:text-white">よくある質問</a>
+                <a href="./access.html" class="text-slate-400 hover:text-white">アクセス</a>
+            </div>
+            <div class="mt-8 pt-8 border-t border-slate-700 text-center text-slate-500 text-sm">
+                &copy; 2024 ココデザイン. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== モバイルメニューの開閉機能 =====
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.querySelectorAll('#mobile-menu a');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            // リンククリックでメニューを閉じる
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+            
+            // ===== スクロール表示アニメーション機能 =====
+            const scrollElements = document.querySelectorAll('.scroll-reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            scrollElements.forEach(el => observer.observe(el));
+            
+            // ===== 工賃比較グラフ =====
+            function initChart() {
+                const ctx = document.getElementById('wageComparisonChart');
+                if (ctx) {
+                    console.log('グラフを描画します');
+                    
+                    // グラデーション作成
+                    const gradient1 = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
+                    gradient1.addColorStop(0, 'rgba(239, 68, 68, 0.8)');
+                    gradient1.addColorStop(1, 'rgba(239, 68, 68, 0.4)');
+                    
+                    const gradient2 = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
+                    gradient2.addColorStop(0, 'rgba(34, 197, 94, 0.8)');
+                    gradient2.addColorStop(1, 'rgba(34, 197, 94, 0.4)');
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['千葉県平均', 'ココデザイン'],
+                            datasets: [{
+                                label: '月額工賃（円）',
+                                data: [20932, 35000],
+                                backgroundColor: [gradient1, gradient2],
+                                borderColor: [
+                                    'rgba(239, 68, 68, 0.9)',
+                                    'rgba(34, 197, 94, 0.9)'
+                                ],
+                                borderWidth: 0,
+                                borderRadius: {
+                                    topLeft: 16,
+                                    topRight: 16,
+                                    bottomLeft: 4,
+                                    bottomRight: 4
+                                },
+                                borderSkipped: false,
+                                barThickness: 60,
+                                maxBarThickness: 80,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 2000,
+                                easing: 'easeOutQuart',
+                                onProgress: function(animation) {
+                                    const chart = animation.chart;
+                                    const ctx = chart.ctx;
+                                    const dataset = chart.data.datasets[0];
+                                    const meta = chart.getDatasetMeta(0);
+                                    
+                                    meta.data.forEach((bar, index) => {
+                                        const data = dataset.data[index];
+                                        const barHeight = bar.height;
+                                        const barY = bar.y;
+                                        
+                                                                                 // グラフの上に数値を表示
+                                         ctx.save();
+                                         ctx.textAlign = 'center';
+                                         ctx.textBaseline = 'bottom';
+                                         ctx.font = 'bold 16px Inter, sans-serif';
+                                         ctx.fillStyle = '#1f2937';
+                                         ctx.fillText(
+                                             data.toLocaleString() + '円',
+                                             bar.x,
+                                             barY - 10
+                                         );
+                                         ctx.restore();
+                                    });
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                    titleColor: 'white',
+                                    bodyColor: 'white',
+                                    borderColor: 'rgba(148, 163, 184, 0.2)',
+                                    borderWidth: 1,
+                                    cornerRadius: 12,
+                                    padding: 12,
+                                    displayColors: false,
+                                    callbacks: {
+                                        title: function(context) {
+                                            return context[0].label;
+                                        },
+                                        label: function(context) {
+                                            return context.parsed.y.toLocaleString() + '円';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                                                 y: {
+                                     beginAtZero: false,
+                                     min: 10000,
+                                     max: 40000,
+                                    ticks: {
+                                        stepSize: 5000,
+                                        callback: function(value) {
+                                            return value.toLocaleString() + '円';
+                                        },
+                                        font: {
+                                            size: 11,
+                                            family: 'Inter, sans-serif'
+                                        },
+                                        color: '#64748b'
+                                    },
+                                    grid: {
+                                        color: 'rgba(148, 163, 184, 0.1)',
+                                        lineWidth: 1,
+                                        drawBorder: false
+                                    },
+                                    border: {
+                                        display: false
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        font: {
+                                            size: 14,
+                                            weight: '600',
+                                            family: 'Inter, sans-serif'
+                                        },
+                                        color: '#1f2937'
+                                    },
+                                    grid: {
+                                        display: false
+                                    },
+                                    border: {
+                                        display: false
+                                    }
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    top: 30
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('グラフのcanvas要素が見つかりません');
+                }
+            }
+            
+            // ページ読み込み後にグラフを初期化
+            setTimeout(initChart, 200);
+        });
+    </script>
+
+    <!-- 右下固定LINEボタン -->
+    <a href="#line-friend" class="fixed-line-button bg-green-500 text-white font-bold py-4 px-6 rounded-full hover:bg-green-600 transition-all duration-300 shadow-lg transform hover:scale-110 text-lg">
+        📱 LINEでお問い合わせ
+    </a>
+</body>
+</html>
+
+
+
+
+
+
