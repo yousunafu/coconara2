@@ -83,12 +83,17 @@
         /* スマホでのLINEボタン位置調整 */
         @media (max-width: 768px) {
             .fixed-line-button {
-                display: none !important; /* スマホでは非表示 */
-                visibility: hidden !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
+                bottom: 20px;
+                left: 50%;
+                right: auto;
+                width: auto;
+                min-width: 200px;
+                text-align: center;
+                transform: translateX(-50%);
             }
         }
+        
+
 
         /* 超太字フォント */
         .font-ultra-bold {
@@ -304,26 +309,12 @@
             }, { threshold: 0.1 });
             scrollElements.forEach(el => observer.observe(el));
             
-            // ===== スマホでのLINEボタン非表示機能 =====
-            const lineButton = document.querySelector('.fixed-line-button');
-            function hideLineButtonOnMobile() {
-                if (window.innerWidth <= 768) {
-                    lineButton.style.display = 'none';
-                } else {
-                    lineButton.style.display = 'block';
-                }
-            }
-            
-            // 初期実行
-            hideLineButtonOnMobile();
-            
-            // リサイズ時にも実行
-            window.addEventListener('resize', hideLineButtonOnMobile);
+
         });
     </script>
 
-    <!-- 右下固定LINEボタン（PCのみ表示） -->
-    <a href="#line-friend" class="fixed-line-button hidden md:block bg-green-500 text-white font-bold py-4 px-6 rounded-full hover:bg-green-600 transition-all duration-300 shadow-lg transform hover:scale-110 text-lg">
+    <!-- 右下固定LINEボタン -->
+    <a href="#line-friend" class="fixed-line-button bg-green-500 text-white font-bold py-4 px-6 rounded-full hover:bg-green-600 transition-all duration-300 shadow-lg transform hover:scale-110 text-lg">
         📱 LINEでお問い合わせ
     </a>
 </body>
