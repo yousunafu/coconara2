@@ -68,6 +68,20 @@
             z-index: 1000;
             animation: pulse 2s infinite;
         }
+        
+        /* スマホでのLINEボタン位置調整 */
+        @media (max-width: 768px) {
+            .fixed-line-button {
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                width: calc(100% - 40px);
+                max-width: 300px;
+                margin: 0 auto;
+                text-align: center;
+                transform: none;
+            }
+        }
 
         @keyframes pulse {
             0% {
