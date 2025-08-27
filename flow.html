@@ -83,7 +83,10 @@
         /* スマホでのLINEボタン位置調整 */
         @media (max-width: 768px) {
             .fixed-line-button {
-                display: none; /* スマホでは非表示 */
+                display: none !important; /* スマホでは非表示 */
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
         }
 
@@ -300,6 +303,22 @@
                 });
             }, { threshold: 0.1 });
             scrollElements.forEach(el => observer.observe(el));
+            
+            // ===== スマホでのLINEボタン非表示機能 =====
+            const lineButton = document.querySelector('.fixed-line-button');
+            function hideLineButtonOnMobile() {
+                if (window.innerWidth <= 768) {
+                    lineButton.style.display = 'none';
+                } else {
+                    lineButton.style.display = 'block';
+                }
+            }
+            
+            // 初期実行
+            hideLineButtonOnMobile();
+            
+            // リサイズ時にも実行
+            window.addEventListener('resize', hideLineButtonOnMobile);
         });
     </script>
 
